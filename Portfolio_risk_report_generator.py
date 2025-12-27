@@ -33,15 +33,15 @@ while True:
     try:
         weights = [float(x.strip()) for x in raw.split(",")]
     except ValueError:
-        print("❌ Please enter only numbers separated by commas.")
+        print("Please enter only numbers separated by commas.")
         continue
 
     if len(weights) != len(asset_names):
-        print(f"❌ You entered {len(weights)} weights but there are {len(asset_names)} assets.")
+        print(f"Invalid input: You entered {len(weights)} weights but there are {len(asset_names)} assets.")
         continue
 
     if not math.isclose(sum(weights), 1.0, abs_tol=1e-6):
-        print(f"❌ Weights must sum to 1. Your sum is {sum(weights):.6f}.")
+        print(f"Error: Weights must sum to 1. Your sum is {sum(weights):.6f}.")
         continue
 
     break
