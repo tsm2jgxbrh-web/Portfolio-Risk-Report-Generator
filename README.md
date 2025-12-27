@@ -20,6 +20,11 @@ asks the user to input portfolio weights (e.g. 0.3, 0.3, 0.4), and generates a p
 - sample_returns.csv  
   CSV Sample dataset with monthly asset returns used for demonstration of the program.
 
+## How to run
+- Make sure Python3 is installed
+- Keep the .csv and .py file in the same folder
+- When prompted, enter portfolio weight that sum up to 1 (example: 0.4, 0.3, 0.3)
+
 ## Authors 
 - Didrik Bengtsson
 - Yiannis Tsigkas
