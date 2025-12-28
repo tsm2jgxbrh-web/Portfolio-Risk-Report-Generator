@@ -26,7 +26,7 @@ with open(CSV_FILE, "r", encoding="utf-8") as f: #utf-8 for text encoding
 
 # Stage 3: Ask the user for weights (must match number of assets and sum to 1)
 print("Assets found in CSV:", ", ".join(asset_names))
-print("Enter weights separated by commas (example: 0.4,0.3,0.3), must sum to 1:")
+print("Enter", len(asset_names), "weights separated by commas (example: 0.4,0.3,0.3), must sum to 1:")
 
 while True:
     raw = input("Weights: ").strip()
@@ -98,10 +98,10 @@ print("Assets: ", ", ".join(asset_names))
 print("Weights: ", ", ".join(str(i) for i in weights))
 print("")
 print("Average monthly return:", pct(avg_return))
-print("Volatility (std dev):  ", pct(volatility))
+print("Volatility (std dev):", pct(volatility))
 print("Best month:", best_date, ',', pct(best_month))
 print("Worst month:", worst_date, ',', pct(worst_month))
-print("Maximum drawdown:      ", pct(max_dd))
+print("Maximum drawdown:", pct(max_dd), "(worst peak-to-through decline)")
 # Final wealth (absolute value) to reflect cumulative portfolio growth
 print("Final wealth (starting from 1 unit):", f"{wealth:.4f}") 
 print("-------------------------\n")
