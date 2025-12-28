@@ -1,4 +1,4 @@
-# Authors: Didrik Bengtsson, Adam Bursic, Max Prohorovs and Yiannis Tsigkas
+#Authors: Didrik Bengtsson, Adam Bursic, Max Prohorovs and Yiannis Tsigkas
 # Portfolio Risk Report Generator
 # This program loads a fixed CSV file called "sample_returns.csv",
 # extracts the data in a straightforward way using csv.DictReader,
@@ -12,17 +12,25 @@ CSV_FILE = "sample_returns.csv"
 
 
 # Stage 2: Read the CSV using DictReader (simple extraction)
-# DictReader reads each row as a dictionary like {"Date": "...", "Stock_A": "...", ...}
-with open(CSV_FILE, "r", encoding="utf-8") as f: #utf-8 for text encoding
-    reader = csv.DictReader(f)
-    asset_names = [name for name in reader.fieldnames if name != "Date"]  # columns except Date
+try:
+    with open(CSV_FILE, "r", encoding="utf-8") as f: #utf-8 for text encoding
+        reader = csv.DictReader(f)
+        asset_names = [name for name in reader.fieldnames if name != "Date"]  # columns except Date
 
-    dates = []
-    asset_returns = []  # list of lists, each inner list is returns for all assets in that month
+        dates = []
+        asset_returns = [] # list of lists, each inner list is returns for all assets in that month
 
-    for row in reader:
-        dates.append(row["Date"])
-        asset_returns.append([float(row[a]) for a in asset_names])
+        for row in reader:
+            dates.append(row["Date"])
+            asset_returns.append([float(row[a]) for a in asset_names])
+
+except FileNotFoundError:
+    print(f"Error: The file '{CSV_FILE}' was not found. Make sure it is in the same folder as this script.")
+    raise SystemExit
+
+except Exception as e:
+    print(f"An error occurred while reading the file: {e}")
+    raise SystemExit
 
 # Stage 3: Ask the user for weights (must match number of assets and sum to 1)
 print("Assets found in CSV:", ", ".join(asset_names))
@@ -44,15 +52,24 @@ while True:
         print(f"Error: Weights must sum to 1. Your sum is {sum(weights):.6f}.")
         continue
 
+# Code only allows non-negative weights (no shorting)        
+    if any(w < 0 for w in weights):
+        print("Warning: Negative weights detected, indicating short positions.")
+        continue
+
     break
 
+def compute_portfolio_returns(asset_returns, weights):
+    portfolio_returns = []
+    for monthly_returns in asset_returns:
+        pr = 0.0
+        for r, w in zip(monthly_returns, weights):
+            pr += r * w
+        portfolio_returns.append(pr)
+    return portfolio_returns
+
 # Stage 4: Compute portfolio returns (weighted sum each month)
-portfolio_returns = []
-for monthly_returns in asset_returns:
-    pr = 0.0
-    for r, w in zip(monthly_returns, weights):
-        pr += r * w
-    portfolio_returns.append(pr)
+portfolio_returns = compute_portfolio_returns(asset_returns, weights)
 
 # Stage 5: Compute simple risk metrics (mean, standard deviation, best/worst, max drawdown)
 
@@ -64,6 +81,15 @@ if len(portfolio_returns) > 1:
     volatility = math.sqrt(variance)
 else:
     volatility = 0.0
+
+# Risk-free rate and Sharpe Ratio
+risk_free_rate = 0.01  # assuming 1% (Swiss 10Y government bond)
+monthly_risk_free = (1 + risk_free_rate) ** (1/12) - 1
+if volatility > 0:
+    sharpe_ratio = (avg_return - monthly_risk_free) / volatility
+else:
+    sharpe_ratio = 0.0
+
 
 # Identify best and worst months and their dates
 best_month = max(portfolio_returns)
@@ -86,6 +112,9 @@ for r in portfolio_returns:
     if dd < max_dd:
         max_dd = dd
 
+# Total return over the period
+total_return = wealth - 1.0
+
 # Stage 6: Print the risk report
 def pct(x):
     return f"{x * 100:.2f}%"
@@ -96,12 +125,19 @@ print("-------------------------")
 print("CSV file used: ", CSV_FILE)
 print("Assets: ", ", ".join(asset_names))
 print("Weights: ", ", ".join(str(i) for i in weights))
+
 print("")
 print("Average monthly return:", pct(avg_return))
 print("Volatility (std dev):", pct(volatility))
+print("Sharpe Ratio (rf=1%):", f"{sharpe_ratio:.4f}")
+
+print("")
 print("Best month:", best_date, ',', pct(best_month))
 print("Worst month:", worst_date, ',', pct(worst_month))
-print("Maximum drawdown:", pct(max_dd), "(worst peak-to-through decline)")
+print("Maximum drawdown:", pct(max_dd), "(worst peak-to-trough decline)")
+
+print("")
+print("Total return over period:", pct(total_return))
 # Final wealth (absolute value) to reflect cumulative portfolio growth
-print("Final wealth (starting from 1 unit):", f"{wealth:.4f}") 
+print("Final wealth (starting from 1 unit):", f"{wealth:.4f}")
 print("-------------------------\n")
