@@ -25,6 +25,8 @@ asks the user to input portfolio weights (e.g. 0.3, 0.3, 0.4), and generates a p
 - Keep the .csv and .py file in the same folder
 - When prompted, enter portfolio weight that sum up to 1 (example: 0.4, 0.3, 0.3)
 
+The program also works with other CSV files that follow the same format (a **Date** column and numeric return columns for each asset
+
 ## Authors 
 - Didrik Bengtsson
 - Yiannis Tsigkas
