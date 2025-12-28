@@ -1,4 +1,4 @@
-#Authors: Didrik Bengtsson, Adam Bursic, Max and Yiannis
+# Authors: Didrik Bengtsson, Adam Bursic, Max Prohorovs and Yiannis Tsigkas
 # Portfolio Risk Report Generator
 # This program loads a fixed CSV file called "sample_returns.csv",
 # extracts the data in a straightforward way using csv.DictReader,
@@ -26,7 +26,7 @@ with open(CSV_FILE, "r", encoding="utf-8") as f: #utf-8 for text encoding
 
 # Stage 3: Ask the user for weights (must match number of assets and sum to 1)
 print("Assets found in CSV:", ", ".join(asset_names))
-print("Enter weights separated by commas (example: 0.4,0.3,0.3), must sum to 1.")
+print("Enter weights separated by commas (example: 0.4,0.3,0.3), must sum to 1:")
 
 while True:
     raw = input("Weights: ").strip()
@@ -56,7 +56,7 @@ for monthly_returns in asset_returns:
 
 # Stage 5: Compute simple risk metrics (mean, standard deviation, best/worst, max drawdown)
 
-# Average return and volatility
+# Average return and volatility - assume numeric and no missing values
 avg_return = sum(portfolio_returns) / len(portfolio_returns)
 
 if len(portfolio_returns) > 1:
