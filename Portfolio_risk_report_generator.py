@@ -32,6 +32,11 @@ except Exception as e:
     print(f"An error occurred while reading the file: {e}")
     raise SystemExit
 
+# Ensure CSV had data rows
+if len(asset_returns) == 0:
+    print("Error: No data rows found in the CSV file.")
+    raise SystemExit
+
 # Stage 3: Ask the user for weights (must match number of assets and sum to 1)
 print("Assets found in CSV:", ", ".join(asset_names))
 print("Enter", len(asset_names), "weights separated by commas (example: 0.4,0.3,0.3), must sum to 1:")
@@ -54,7 +59,7 @@ while True:
 
 # Code only allows non-negative weights (no shorting)        
     if any(w < 0 for w in weights):
-        print("Warning: Negative weights detected, indicating short positions.")
+        print("Error: Weights must be non-negative (long-only portfolio).")
         continue
 
     break
@@ -82,7 +87,7 @@ if len(portfolio_returns) > 1:
 else:
     volatility = 0.0
 
-# Risk-free rate and Sharpe Ratio
+# Risk-free rate and Sharpe Ratio (computed on a monthly basis)
 risk_free_rate = 0.01  # assuming 1% (Swiss 10Y government bond)
 monthly_risk_free = (1 + risk_free_rate) ** (1/12) - 1
 if volatility > 0:
@@ -124,17 +129,18 @@ print("  PORTFOLIO RISK REPORT")
 print("-------------------------")
 print("CSV file used: ", CSV_FILE)
 print("Assets: ", ", ".join(asset_names))
-print("Weights: ", ", ".join(str(i) for i in weights))
+print("Weights: ", ", ".join(f"{pct(w)}" for w in weights))
 
 print("")
 print("Average monthly return:", pct(avg_return))
 print("Volatility (std dev):", pct(volatility))
-print("Sharpe Ratio (rf=1%):", f"{sharpe_ratio:.4f}")
+print("Sharpe Ratio (monthly, based on annual rf=1%):", f"{sharpe_ratio:.4f}")
 
 print("")
 print("Best month:", best_date, ',', pct(best_month))
 print("Worst month:", worst_date, ',', pct(worst_month))
-print("Maximum drawdown:", pct(max_dd), "(worst peak-to-trough decline)")
+# Display drawdown as positive percentage
+print("Maximum drawdown:", pct(abs(max_dd)), "(worst peak-to-trough decline)") 
 
 print("")
 print("Total return over period:", pct(total_return))
